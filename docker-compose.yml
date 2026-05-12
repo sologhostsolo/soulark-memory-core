@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  memory-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${MEMORY_CORE_IMAGE:-soulark-memory-core:local}
+    container_name: ${MEMORY_CORE_CONTAINER_NAME:-soulark-memory-core}
+    restart: unless-stopped
+    ports:
+      - "${MEMORY_CORE_BIND_PORT:-8765}:8765"
+    environment:
+      MEMORY_CORE_DB_PATH: /data/memory_core.db
+      MEMORY_CORE_HOST: 0.0.0.0
+      MEMORY_CORE_PORT: 8765
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from urllib.request import urlopen; urlopen('http://127.0.0.1:8765/health', timeout=3).read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s

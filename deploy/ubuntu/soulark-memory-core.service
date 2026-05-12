@@ -1,0 +1,16 @@
+[Unit]
+Description=SoulArk Memory Core
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/opt/soulark-memory-core
+EnvironmentFile=-/opt/soulark-memory-core/deploy/ubuntu/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/soulark-memory-core/.venv/bin/python /opt/soulark-memory-core/run.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -55,6 +55,27 @@ docker run --rm -p 8765:8765 -v memory-core-data:/data soulark-memory-core
 
 The database path defaults to `/data/memory_core.db` in Docker and `data/memory_core.db` locally.
 
+For a temporary online test environment on Linux:
+
+```bash
+docker compose up -d --build
+bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765
+```
+
+The compose file lives at `docker-compose.yml` and persists SQLite data under `./data`.
+
+If you prefer `systemd` instead of Docker:
+
+```bash
+bash deploy/ubuntu/bootstrap.sh
+cp deploy/ubuntu/env.example deploy/ubuntu/.env
+sudo cp deploy/ubuntu/soulark-memory-core.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now soulark-memory-core@$(whoami)
+```
+
+This setup is intended for temporary validation, not direct public Internet exposure without an access control layer.
+
 For a one-command Docker acceptance flow on Windows PowerShell:
 
 ```powershell
