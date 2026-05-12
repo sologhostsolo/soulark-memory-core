@@ -24,6 +24,16 @@ python run.py
 
 Default service address: `http://127.0.0.1:8765`
 
+## Personal Integration Sample
+
+Run a minimal `Personal -> Core` HTTP sample against a running local service:
+
+```bash
+python examples/personal_core_integration_sample.py
+```
+
+The sample writes one memory item through HTTP, then verifies `search`, `daily_recall`, and `export` from the same service.
+
 ## Endpoints
 
 - `GET /health`
@@ -44,3 +54,9 @@ docker run --rm -p 8765:8765 -v memory-core-data:/data soulark-memory-core
 ```
 
 The database path defaults to `/data/memory_core.db` in Docker and `data/memory_core.db` locally.
+
+For a one-command Docker acceptance flow on Windows PowerShell:
+
+```powershell
+./scripts/verify_docker_acceptance.ps1
+```
