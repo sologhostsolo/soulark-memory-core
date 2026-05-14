@@ -1,8 +1,28 @@
 # SoulArk Memory Core
 
-`SoulArk Memory Core` is the first runnable scaffold for the shared memory foundation described in the product roadmap.
+> Open-source long-term memory core for AI Agents: stop making your AI start from zero every time.
 
-Current scope is intentionally narrow:
+[中文说明](README.zh-CN.md)
+
+SoulArk Memory Core is a self-hostable long-term memory foundation for AI agents, personal AI assistants, and digital twin products. It focuses on durable memory records, traceable evidence, deletion, export, and a small HTTP API that can sit behind your own agent layer.
+
+## Why SoulArk Memory Core?
+
+Most AI assistants are stateless: every new session feels like a fresh introduction. SoulArk Memory Core gives your agent a minimal memory API so it can write, recall, inspect, delete, and export memory with evidence.
+
+It is designed for:
+
+- long-term memory for AI agents
+- self-hosted personal AI assistants
+- model-agnostic memory infrastructure
+- digital twin and second-brain products
+- applications that need traceable evidence instead of opaque recall
+
+SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time, so the project emphasizes evidence, traceability, deletion, and export.
+
+## Current Scope
+
+The v0.1 scope is intentionally narrow:
 
 - `write`
 - `search`
@@ -13,7 +33,7 @@ Current scope is intentionally narrow:
 - SQLite persistence
 - minimal Flask web surface
 
-This scaffold does not include persona, prompt orchestration, project-state prompting, ambient logic, or any channel connectors.
+This v0.1 scope does not include persona, prompt orchestration, project-state prompting, ambient logic, surprise recall, policy guard logic, or channel connectors. Those belong in the agent/product layer above Memory Core.
 
 ## Quick Start
 
