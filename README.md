@@ -20,6 +20,17 @@ It is designed for:
 
 SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time, so the project emphasizes evidence, traceability, deletion, and export.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    A["AI Agent / Personal App"] --> B["Memory Core HTTP API"]
+    B --> C["Write / Search / Date Recall / Daily Recall"]
+    C --> D["SQLite Store"]
+    D --> E["Evidence-backed Results"]
+    E --> A
+```
+
 ## Current Scope
 
 The v0.1 scope is intentionally narrow:
@@ -43,6 +54,47 @@ python run.py
 ```
 
 Default service address: `http://127.0.0.1:8765`
+
+## API Examples
+
+Write one memory item:
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/write \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "user_id": "demo_user",
+        "memory_space": "personal",
+        "source_id": "demo-001",
+        "content": "I tested SoulArk Memory Core today.",
+        "event_type": "raw_message",
+        "sender": "user",
+        "role": "assistant",
+        "occurred_at": "2026-05-14T10:00:00+00:00"
+      }
+    ]
+  }'
+```
+
+Search memory:
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/search \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","query":"Memory Core","limit":5}'
+```
+
+Export and delete:
+
+```bash
+curl "http://127.0.0.1:8765/api/v1/export?user_id=demo_user&memory_space=personal&limit=10"
+
+curl -X POST http://127.0.0.1:8765/api/v1/delete \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","source_id":"demo-001"}'
+```
 
 ## Personal Integration Sample
 
@@ -101,3 +153,14 @@ For a one-command Docker acceptance flow on Windows PowerShell:
 ```powershell
 ./scripts/verify_docker_acceptance.ps1
 ```
+
+## Security Notes
+
+- Do not expose this service directly to the public Internet without authentication, authorization, and rate limiting.
+- Do not commit real memory databases, `.env` files, API keys, logs, or personal data.
+- The repository keeps `data/.gitkeep` only; runtime SQLite files are ignored by `.gitignore`.
+- Treat memory exports as sensitive user data.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

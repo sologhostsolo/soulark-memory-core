@@ -24,6 +24,17 @@ SoulArk Memory Core 的目标是提供一个独立的记忆底座，让上层 Ag
 
 它不承诺“永远正确”或“永久不变”。长期记忆会过期、会被纠正，也可能需要重新确认。所以 v0.1 更强调 evidence、traceability、delete、export，而不是黑盒式“我记得”。
 
+## 架构
+
+```mermaid
+flowchart LR
+    A["AI Agent / Personal App"] --> B["Memory Core HTTP API"]
+    B --> C["Write / Search / Date Recall / Daily Recall"]
+    C --> D["SQLite Store"]
+    D --> E["Evidence-backed Results"]
+    E --> A
+```
+
 ## 当前范围
 
 v0.1 范围刻意保持很窄：
@@ -57,6 +68,47 @@ python run.py
 ```
 
 默认服务地址：`http://127.0.0.1:8765`
+
+## API 示例
+
+写入一条记忆：
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/write \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "user_id": "demo_user",
+        "memory_space": "personal",
+        "source_id": "demo-001",
+        "content": "I tested SoulArk Memory Core today.",
+        "event_type": "raw_message",
+        "sender": "user",
+        "role": "assistant",
+        "occurred_at": "2026-05-14T10:00:00+00:00"
+      }
+    ]
+  }'
+```
+
+搜索记忆：
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/search \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","query":"Memory Core","limit":5}'
+```
+
+导出和删除：
+
+```bash
+curl "http://127.0.0.1:8765/api/v1/export?user_id=demo_user&memory_space=personal&limit=10"
+
+curl -X POST http://127.0.0.1:8765/api/v1/delete \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","source_id":"demo-001"}'
+```
 
 ## Personal 集成示例
 
@@ -115,3 +167,14 @@ Windows PowerShell 一键 Docker 验收：
 ```powershell
 ./scripts/verify_docker_acceptance.ps1
 ```
+
+## 安全说明
+
+- 不要在没有鉴权、授权和限流的情况下把服务直接暴露到公网。
+- 不要提交真实记忆数据库、`.env`、API key、日志或个人数据。
+- 仓库只保留 `data/.gitkeep`；运行时生成的 SQLite 文件已被 `.gitignore` 忽略。
+- 记忆导出应视为敏感用户数据处理。
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
