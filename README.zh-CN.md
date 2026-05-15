@@ -1,39 +1,64 @@
 # SoulArk Memory Core
 
-> 开源 AI Agent 长期记忆核心：让 AI 不再每次从零认识你。
+> 开源 AI 长期记忆可信底座：让 AI 记住用户、项目和决策，而且每条记忆都有证据、可删除、可导出。
 
-[English](README.md)
+[English](README.en.md)
 
-SoulArk Memory Core 是一个可自托管、可追溯、可删除、可导出的长期记忆底座，面向 AI Agent、个人 AI 助手和数字分身场景。
+SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包装。它是给 Personal、Work、Agent 产品使用的长期记忆 Core：负责把记忆写下来，按语义或日期召回，带证据返回，并支持删除和导出。
 
-它不是一个“记忆保险箱”，也不是普通向量库包装。它更接近一套给 AI Agent 使用的长期记忆 API：负责把记忆写下来、按语义或日期召回、带证据返回、支持删除和导出。
+它适合用来构建：
 
-## 为什么需要它？
+- 个人 AI 助手的长期记忆
+- 项目记忆助手
+- 客户历史助手
+- 专家经验助手
+- 数字分身 / 第二大脑产品
+- 需要私有部署、证据追溯、删除和导出的 Agent 应用
+
+## 解决什么问题
 
 很多 AI 助手每次对话都像重新认识你：换模型、换应用、换会话后，过去的上下文就断了。
 
-SoulArk Memory Core 的目标是提供一个独立的记忆底座，让上层 Agent 可以通过稳定 API 使用长期记忆，而不是把记忆绑定在某个模型厂商、某个聊天窗口或某个应用里。
+SoulArk Memory Core 提供一个独立、可自托管、跨模型的长期记忆 API，让上层 Agent 可以稳定地写入、搜索、按日期召回、删除和导出记忆，而不是把记忆绑定在某个模型厂商、某个聊天窗口或某个应用里。
 
-适合的方向：
+它不承诺“永远正确”或“永久不变”。长期记忆会过期、会被纠正，也可能需要重新确认。所以 v0.1 更强调：
 
-- AI Agent 长期记忆核心
-- 可自托管的个人 AI 记忆底座
-- 跨模型、跨应用的记忆 API
-- 面向数字分身 / 第二大脑产品
-- 需要证据追溯、删除、导出的 Agent 应用
+- evidence：每条召回都有证据
+- traceability：能追溯来源
+- delete：能删除
+- export：能导出
+- self-hosted：能自己部署
 
-它不承诺“永远正确”或“永久不变”。长期记忆会过期、会被纠正，也可能需要重新确认。所以 v0.1 更强调 evidence、traceability、delete、export，而不是黑盒式“我记得”。
-
-## 架构
+## 技术结构
 
 ```mermaid
-flowchart LR
-    A["AI Agent / Personal App"] --> B["Memory Core HTTP API"]
-    B --> C["Write / Search / Date Recall / Daily Recall"]
-    C --> D["SQLite Store"]
-    D --> E["Evidence-backed Results"]
-    E --> A
+flowchart TD
+    A["AI 助手 / Agent / Personal / Work"] --> B["SoulArk Memory Core"]
+    B --> C["write"]
+    B --> D["search"]
+    B --> E["date_recall"]
+    B --> F["daily_recall"]
+    B --> G["delete"]
+    B --> H["export"]
+    C --> I["SQLite Store"]
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J["Evidence-backed Results"]
+    J --> A
 ```
+
+## 产品分层
+
+```mermaid
+flowchart TD
+    A["SoulArk Memory Core<br/>开源可信记忆底座"] --> B["SoulArk Personal<br/>个人长期记忆样板间"]
+    B --> C["SoulArk Work / Memory Service<br/>项目记忆 / 客户历史 / 专家经验私有化方案"]
+```
+
+Memory Core 只做底层长期记忆能力。Personal、Work、PolicyGuard、Ambient、Surprise、Project State 这些属于上层产品体验，不放进 Core v0.1。
 
 ## 当前范围
 
@@ -46,7 +71,10 @@ v0.1 范围刻意保持很窄：
 - `delete`
 - `export`
 - SQLite 存储
+- HTTP API
+- Docker
 - 最小 Flask Web / Demo 页面
+- evidence 返回
 
 v0.1 不包含：
 
@@ -57,8 +85,21 @@ v0.1 不包含：
 - Ambient / Surprise
 - 复杂业务编排
 - 飞书 / Web / 桌面端等连接器
+- 企业权限系统
 
-这些属于上层 Agent / 产品体验层，不属于 Memory Core 底座。
+## 和普通知识库有什么区别
+
+普通知识库更像“查资料”，SoulArk Memory Core 更像“记住发生过什么”。
+
+它关注的不只是文本匹配，还包括：
+
+- 这条记忆属于谁
+- 发生在什么时候
+- 来源是什么
+- 为什么能这么回答
+- 能不能删除
+- 能不能导出
+- 后续能否被纠正或替换
 
 ## 快速开始
 
@@ -161,41 +202,18 @@ python examples/personal_core_integration_sample.py
 - `POST /api/v1/delete`
 - `GET /api/v1/export`
 
-## Docker
-
-```bash
-docker build -t soulark-memory-core .
-docker run --rm -p 8765:8765 -v memory-core-data:/data soulark-memory-core
-```
-
-Docker 环境下数据库默认在 `/data/memory_core.db`，本地运行时默认在 `data/memory_core.db`。
-
-Linux 临时测试环境：
+## Docker 验收
 
 ```bash
 docker compose up -d --build
 bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765
 ```
 
-`docker-compose.yml` 会把 SQLite 数据持久化到 `./data`。
-
 HTTP 验收脚本会验证完整 v0.1 闭环：
 
 ```text
 health -> write -> search -> daily_recall -> export -> delete
 ```
-
-如果你更习惯 `systemd`：
-
-```bash
-bash deploy/ubuntu/bootstrap.sh
-cp deploy/ubuntu/env.example deploy/ubuntu/.env
-sudo cp deploy/ubuntu/soulark-memory-core.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now soulark-memory-core@$(whoami)
-```
-
-这个部署方式适合临时验证。直接暴露到公网前，请自行增加访问控制层。
 
 Windows PowerShell 一键 Docker 验收：
 
@@ -220,6 +238,13 @@ Windows PowerShell 一键 Docker 验收：
 - 不要提交真实记忆数据库、`.env`、API key、日志或个人数据。
 - 仓库只保留 `data/.gitkeep`；运行时生成的 SQLite 文件已被 `.gitignore` 忽略。
 - 记忆导出应视为敏感用户数据处理。
+
+## 路线图
+
+- v0.1：write / search / date_recall / daily_recall / delete / export / evidence / Docker
+- v0.2：Memory Card、FTS5、更清晰的 Web 查看
+- v0.3：MCP / Project Brief
+- v0.4：stale memory、needs_review、superseded
 
 ## License
 

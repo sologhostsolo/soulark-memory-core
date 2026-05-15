@@ -1,39 +1,68 @@
 # SoulArk Memory Core
 
-> Open-source long-term memory core for AI Agents: stop making your AI start from zero every time.
+> 开源 AI 长期记忆可信底座：让 AI 记住用户、项目和决策，而且每条记忆都有证据、可删除、可导出。
 
-[中文说明](README.zh-CN.md)
+[English](README.en.md)
 
-SoulArk Memory Core is a self-hostable long-term memory foundation for AI agents, personal AI assistants, and digital twin products. It focuses on durable memory records, traceable evidence, deletion, export, and a small HTTP API that can sit behind your own agent layer.
+SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包装。它是给 Personal、Work、Agent 产品使用的长期记忆 Core：负责把记忆写下来，按语义或日期召回，带证据返回，并支持删除和导出。
 
-## Why SoulArk Memory Core?
+它适合用来构建：
 
-Most AI assistants are stateless: every new session feels like a fresh introduction. SoulArk Memory Core gives your agent a minimal memory API so it can write, recall, inspect, delete, and export memory with evidence.
+- 个人 AI 助手的长期记忆
+- 项目记忆助手
+- 客户历史助手
+- 专家经验助手
+- 数字分身 / 第二大脑产品
+- 需要私有部署、证据追溯、删除和导出的 Agent 应用
 
-It is designed for:
+## 解决什么问题
 
-- long-term memory for AI agents
-- self-hosted personal AI assistants
-- model-agnostic memory infrastructure
-- digital twin and second-brain products
-- applications that need traceable evidence instead of opaque recall
+很多 AI 助手每次对话都像重新认识你：换模型、换应用、换会话后，过去的上下文就断了。
 
-SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time, so the project emphasizes evidence, traceability, deletion, and export.
+SoulArk Memory Core 提供一个独立、可自托管、跨模型的长期记忆 API，让上层 Agent 可以稳定地写入、搜索、按日期召回、删除和导出记忆，而不是把记忆绑定在某个模型厂商、某个聊天窗口或某个应用里。
 
-## Architecture
+它不承诺“永远正确”或“永久不变”。长期记忆会过期、会被纠正，也可能需要重新确认。所以 v0.1 更强调：
+
+- evidence：每条召回都有证据
+- traceability：能追溯来源
+- delete：能删除
+- export：能导出
+- self-hosted：能自己部署
+
+## 技术结构
 
 ```mermaid
-flowchart LR
-    A["AI Agent / Personal App"] --> B["Memory Core HTTP API"]
-    B --> C["Write / Search / Date Recall / Daily Recall"]
-    C --> D["SQLite Store"]
-    D --> E["Evidence-backed Results"]
-    E --> A
+flowchart TD
+    A["AI 助手 / Agent / Personal / Work"] --> B["SoulArk Memory Core"]
+    B --> C["write"]
+    B --> D["search"]
+    B --> E["date_recall"]
+    B --> F["daily_recall"]
+    B --> G["delete"]
+    B --> H["export"]
+    C --> I["SQLite Store"]
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J["Evidence-backed Results"]
+    J --> A
 ```
 
-## Current Scope
+## 产品分层
 
-The v0.1 scope is intentionally narrow:
+```mermaid
+flowchart TD
+    A["SoulArk Memory Core<br/>开源可信记忆底座"] --> B["SoulArk Personal<br/>个人长期记忆样板间"]
+    B --> C["SoulArk Work / Memory Service<br/>项目记忆 / 客户历史 / 专家经验私有化方案"]
+```
+
+Memory Core 只做底层长期记忆能力。Personal、Work、PolicyGuard、Ambient、Surprise、Project State 这些属于上层产品体验，不放进 Core v0.1。
+
+## 当前范围
+
+v0.1 范围刻意保持很窄：
 
 - `write`
 - `search`
@@ -41,32 +70,58 @@ The v0.1 scope is intentionally narrow:
 - `daily_recall`
 - `delete`
 - `export`
-- SQLite persistence
-- minimal Flask web surface
+- SQLite 存储
+- HTTP API
+- Docker
+- 最小 Flask Web / Demo 页面
+- evidence 返回
 
-This v0.1 scope does not include persona, prompt orchestration, project-state prompting, ambient logic, surprise recall, policy guard logic, or channel connectors. Those belong in the agent/product layer above Memory Core.
+v0.1 不包含：
 
-## Quick Start
+- 人设 prompt
+- Stable Profile
+- PolicyGuard
+- Project State
+- Ambient / Surprise
+- 复杂业务编排
+- 飞书 / Web / 桌面端等连接器
+- 企业权限系统
 
-Docker Compose:
+## 和普通知识库有什么区别
+
+普通知识库更像“查资料”，SoulArk Memory Core 更像“记住发生过什么”。
+
+它关注的不只是文本匹配，还包括：
+
+- 这条记忆属于谁
+- 发生在什么时候
+- 来源是什么
+- 为什么能这么回答
+- 能不能删除
+- 能不能导出
+- 后续能否被纠正或替换
+
+## 快速开始
+
+Docker Compose：
 
 ```bash
 docker compose up -d --build
 curl http://127.0.0.1:8765/health
 ```
 
-Local Python:
+本地 Python：
 
 ```bash
 pip install -r requirements.txt
 python run.py
 ```
 
-Default service address: `http://127.0.0.1:8765`
+默认服务地址：`http://127.0.0.1:8765`
 
-## API Examples
+## API 示例
 
-Write one memory item:
+写入一条记忆：
 
 ```bash
 curl -X POST http://127.0.0.1:8765/api/v1/write \
@@ -87,7 +142,7 @@ curl -X POST http://127.0.0.1:8765/api/v1/write \
   }'
 ```
 
-Search memory:
+搜索记忆：
 
 ```bash
 curl -X POST http://127.0.0.1:8765/api/v1/search \
@@ -95,7 +150,7 @@ curl -X POST http://127.0.0.1:8765/api/v1/search \
   -d '{"user_id":"demo_user","memory_space":"personal","query":"Memory Core","limit":5}'
 ```
 
-Recall by date:
+按日期召回：
 
 ```bash
 curl -X POST http://127.0.0.1:8765/api/v1/date-recall \
@@ -103,7 +158,7 @@ curl -X POST http://127.0.0.1:8765/api/v1/date-recall \
   -d '{"user_id":"demo_user","memory_space":"personal","date":"2026-05-14","timezone":"UTC","limit":10}'
 ```
 
-Daily recall:
+按天汇总召回：
 
 ```bash
 curl -X POST http://127.0.0.1:8765/api/v1/daily-recall \
@@ -111,13 +166,13 @@ curl -X POST http://127.0.0.1:8765/api/v1/daily-recall \
   -d '{"user_id":"demo_user","memory_space":"personal","date":"2026-05-14","timezone":"UTC","limit":10}'
 ```
 
-Export:
+导出：
 
 ```bash
 curl "http://127.0.0.1:8765/api/v1/export?user_id=demo_user&memory_space=personal&limit=10"
 ```
 
-Delete:
+删除：
 
 ```bash
 curl -X POST http://127.0.0.1:8765/api/v1/delete \
@@ -125,17 +180,17 @@ curl -X POST http://127.0.0.1:8765/api/v1/delete \
   -d '{"user_id":"demo_user","memory_space":"personal","ids":["<memory_id_from_write_response>"]}'
 ```
 
-## Personal Integration Sample
+## Personal 集成示例
 
-Run a minimal `Personal -> Core` HTTP sample against a running local service:
+启动本地服务后，可以运行一个最小的 `Personal -> Core` HTTP 示例：
 
 ```bash
 python examples/personal_core_integration_sample.py
 ```
 
-The sample writes one memory item through HTTP, then verifies `search`, `daily_recall`, and `export` from the same service.
+这个示例会通过 HTTP 写入一条记忆，然后验证 `search`、`daily_recall` 和 `export`。
 
-## Endpoints
+## API
 
 - `GET /health`
 - `GET /`
@@ -147,65 +202,49 @@ The sample writes one memory item through HTTP, then verifies `search`, `daily_r
 - `POST /api/v1/delete`
 - `GET /api/v1/export`
 
-## Docker
-
-```bash
-docker build -t soulark-memory-core .
-docker run --rm -p 8765:8765 -v memory-core-data:/data soulark-memory-core
-```
-
-The database path defaults to `/data/memory_core.db` in Docker and `data/memory_core.db` locally.
-
-For a temporary online test environment on Linux:
+## Docker 验收
 
 ```bash
 docker compose up -d --build
 bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765
 ```
 
-The compose file lives at `docker-compose.yml` and persists SQLite data under `./data`.
-
-The HTTP acceptance script verifies the complete v0.1 loop:
+HTTP 验收脚本会验证完整 v0.1 闭环：
 
 ```text
 health -> write -> search -> daily_recall -> export -> delete
 ```
 
-If you prefer `systemd` instead of Docker:
-
-```bash
-bash deploy/ubuntu/bootstrap.sh
-cp deploy/ubuntu/env.example deploy/ubuntu/.env
-sudo cp deploy/ubuntu/soulark-memory-core.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now soulark-memory-core@$(whoami)
-```
-
-This setup is intended for temporary validation, not direct public Internet exposure without an access control layer.
-
-For a one-command Docker acceptance flow on Windows PowerShell:
+Windows PowerShell 一键 Docker 验收：
 
 ```powershell
 ./scripts/verify_docker_acceptance.ps1
 ```
 
-## Release Checklist
+## 发布前检查
 
-Before publishing or sharing a deployment, verify:
+对外分享或部署前，至少确认：
 
-- `data/` contains only `.gitkeep` in the repository.
-- `.env`, API keys, logs, and SQLite runtime files are not committed.
-- `bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765` passes on Linux.
-- `./scripts/verify_docker_acceptance.ps1` passes on Windows with Docker.
-- The service is kept behind your own auth gateway before any public exposure.
+- 仓库里的 `data/` 只保留 `.gitkeep`。
+- `.env`、API key、日志、SQLite 运行时文件没有进入仓库。
+- Linux 上 `bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765` 能通过。
+- Windows Docker 环境下 `./scripts/verify_docker_acceptance.ps1` 能通过。
+- 如果要暴露给外部访问，必须放在你自己的鉴权网关后面。
 
-## Security Notes
+## 安全说明
 
-- Do not expose this service directly to the public Internet without authentication, authorization, and rate limiting.
-- Add TLS, request logging, backup policy, and access audit before handling real customer or company memory.
-- Do not commit real memory databases, `.env` files, API keys, logs, or personal data.
-- The repository keeps `data/.gitkeep` only; runtime SQLite files are ignored by `.gitignore`.
-- Treat memory exports as sensitive user data.
+- 不要在没有鉴权、授权和限流的情况下把服务直接暴露到公网。
+- 处理真实客户或公司记忆前，需要补 TLS、访问日志、备份策略和审计能力。
+- 不要提交真实记忆数据库、`.env`、API key、日志或个人数据。
+- 仓库只保留 `data/.gitkeep`；运行时生成的 SQLite 文件已被 `.gitignore` 忽略。
+- 记忆导出应视为敏感用户数据处理。
+
+## 路线图
+
+- v0.1：write / search / date_recall / daily_recall / delete / export / evidence / Docker
+- v0.2：Memory Card、FTS5、更清晰的 Web 查看
+- v0.3：MCP / Project Brief
+- v0.4：stale memory、needs_review、superseded
 
 ## License
 
