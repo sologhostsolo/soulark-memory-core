@@ -48,7 +48,22 @@ try {
             )
         } | ConvertTo-Json -Depth 6
 
-        $null = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/write" -Method Post -ContentType "application/json" -Body $writeBody
+        $writeResult = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/write" -Method Post -ContentType "application/json" -Body $writeBody
+        if ($writeResult.accepted_count -lt 1) {
+            throw "Write acceptance failed."
+        }
+
+        $searchBody = @{
+            query = "Docker Day 10"
+            user_id = "demo-user"
+            memory_space = "personal"
+            limit = 5
+        } | ConvertTo-Json -Depth 6
+
+        $searchResult = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/search" -Method Post -ContentType "application/json" -Body $searchBody
+        if ($searchResult.raw_count -lt 1) {
+            throw "Search acceptance failed."
+        }
 
         $dailyBody = @{
             date = "2026-05-12"
@@ -58,12 +73,36 @@ try {
         } | ConvertTo-Json -Depth 6
 
         $dailyRecall = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/daily-recall" -Method Post -ContentType "application/json" -Body $dailyBody
-        $exportResult = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/export?user_id=demo-user&memory_space=personal&format=json" -Method Get
+        if ($dailyRecall.daily_recall.entry_count -lt 1) {
+            throw "Daily recall acceptance failed."
+        }
+
+        $exportBeforeDelete = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/export?user_id=demo-user&memory_space=personal&format=json" -Method Get
+        if ($exportBeforeDelete.count -lt 1) {
+            throw "Export acceptance failed."
+        }
+
+        $deleteBody = @{
+            ids = @($writeResult.memory_ids[0])
+            user_id = "demo-user"
+            memory_space = "personal"
+        } | ConvertTo-Json -Depth 6
+
+        $deleteResult = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/delete" -Method Post -ContentType "application/json" -Body $deleteBody
+        if ($deleteResult.deleted_count -lt 1) {
+            throw "Delete acceptance failed."
+        }
+
+        $exportAfterDelete = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/v1/export?user_id=demo-user&memory_space=personal&format=json" -Method Get
 
         [pscustomobject]@{
             health = $health
+            write = $writeResult
+            search = $searchResult
             daily_recall = $dailyRecall
-            export = $exportResult
+            export_before_delete = $exportBeforeDelete
+            delete = $deleteResult
+            export_after_delete = $exportAfterDelete
         } | ConvertTo-Json -Depth 8
     }
     finally {

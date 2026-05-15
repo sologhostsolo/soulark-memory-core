@@ -62,6 +62,15 @@ v0.1 不包含：
 
 ## 快速开始
 
+Docker Compose：
+
+```bash
+docker compose up -d --build
+curl http://127.0.0.1:8765/health
+```
+
+本地 Python：
+
 ```bash
 pip install -r requirements.txt
 python run.py
@@ -100,14 +109,34 @@ curl -X POST http://127.0.0.1:8765/api/v1/search \
   -d '{"user_id":"demo_user","memory_space":"personal","query":"Memory Core","limit":5}'
 ```
 
-导出和删除：
+按日期召回：
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/date-recall \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","date":"2026-05-14","timezone":"UTC","limit":10}'
+```
+
+按天汇总召回：
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/daily-recall \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","date":"2026-05-14","timezone":"UTC","limit":10}'
+```
+
+导出：
 
 ```bash
 curl "http://127.0.0.1:8765/api/v1/export?user_id=demo_user&memory_space=personal&limit=10"
+```
 
+删除：
+
+```bash
 curl -X POST http://127.0.0.1:8765/api/v1/delete \
   -H "Content-Type: application/json" \
-  -d '{"user_id":"demo_user","memory_space":"personal","source_id":"demo-001"}'
+  -d '{"user_id":"demo_user","memory_space":"personal","ids":["<memory_id_from_write_response>"]}'
 ```
 
 ## Personal 集成示例
@@ -150,6 +179,12 @@ bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765
 
 `docker-compose.yml` 会把 SQLite 数据持久化到 `./data`。
 
+HTTP 验收脚本会验证完整 v0.1 闭环：
+
+```text
+health -> write -> search -> daily_recall -> export -> delete
+```
+
 如果你更习惯 `systemd`：
 
 ```bash
@@ -168,9 +203,20 @@ Windows PowerShell 一键 Docker 验收：
 ./scripts/verify_docker_acceptance.ps1
 ```
 
+## 发布前检查
+
+对外分享或部署前，至少确认：
+
+- 仓库里的 `data/` 只保留 `.gitkeep`。
+- `.env`、API key、日志、SQLite 运行时文件没有进入仓库。
+- Linux 上 `bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765` 能通过。
+- Windows Docker 环境下 `./scripts/verify_docker_acceptance.ps1` 能通过。
+- 如果要暴露给外部访问，必须放在你自己的鉴权网关后面。
+
 ## 安全说明
 
 - 不要在没有鉴权、授权和限流的情况下把服务直接暴露到公网。
+- 处理真实客户或公司记忆前，需要补 TLS、访问日志、备份策略和审计能力。
 - 不要提交真实记忆数据库、`.env`、API key、日志或个人数据。
 - 仓库只保留 `data/.gitkeep`；运行时生成的 SQLite 文件已被 `.gitignore` 忽略。
 - 记忆导出应视为敏感用户数据处理。

@@ -24,11 +24,26 @@ curl --fail --silent \
 
 curl --fail --silent \
   -H "Content-Type: application/json" \
+  -d '{"query":"acceptance flow","user_id":"demo-user","memory_space":"personal","limit":5}' \
+  "$BASE_URL/api/v1/search" > /tmp/memory_core_search.json
+
+curl --fail --silent \
+  -H "Content-Type: application/json" \
   -d '{"date":"2026-05-12","user_id":"demo-user","memory_space":"personal","timezone":"UTC"}' \
   "$BASE_URL/api/v1/daily-recall" > /tmp/memory_core_daily_recall.json
 
 curl --fail --silent \
-  "$BASE_URL/api/v1/export?user_id=demo-user&memory_space=personal&format=json" > /tmp/memory_core_export.json
+  "$BASE_URL/api/v1/export?user_id=demo-user&memory_space=personal&format=json" > /tmp/memory_core_export_before_delete.json
+
+DELETE_ID="$($PYTHON_BIN -c 'import json; print(json.load(open("/tmp/memory_core_write.json", encoding="utf-8"))["memory_ids"][0])')"
+
+curl --fail --silent \
+  -H "Content-Type: application/json" \
+  -d "{\"ids\":[\"$DELETE_ID\"],\"user_id\":\"demo-user\",\"memory_space\":\"personal\"}" \
+  "$BASE_URL/api/v1/delete" > /tmp/memory_core_delete.json
+
+curl --fail --silent \
+  "$BASE_URL/api/v1/export?user_id=demo-user&memory_space=personal&format=json" > /tmp/memory_core_export_after_delete.json
 
 $PYTHON_BIN - <<'PY'
 import json
@@ -39,8 +54,11 @@ def load_json(path):
 
 health = load_json('/tmp/memory_core_health.json')
 write_result = load_json('/tmp/memory_core_write.json')
+search_result = load_json('/tmp/memory_core_search.json')
 daily_recall = load_json('/tmp/memory_core_daily_recall.json')
-export_result = load_json('/tmp/memory_core_export.json')
+export_before_delete = load_json('/tmp/memory_core_export_before_delete.json')
+delete_result = load_json('/tmp/memory_core_delete.json')
+export_after_delete = load_json('/tmp/memory_core_export_after_delete.json')
 accepted_count = write_result.get('accepted_count')
 if accepted_count is None:
   accepted_count = write_result.get('written_count', 0)
@@ -56,15 +74,24 @@ if daily_recall_grouped is None:
 
 assert health.get('ok') is True or health.get('status') == 'ok', health
 assert accepted_count >= 1, write_result
+assert search_result.get('status') == 'ok', search_result
+assert search_result.get('raw_count', 0) >= 1, search_result
 assert daily_recall.get('status') == 'ok', daily_recall
 assert daily_recall_count is not None and daily_recall_count >= 1, daily_recall
 assert isinstance(daily_recall_grouped, list), daily_recall
-assert isinstance(export_result.get('items'), list), export_result
+assert isinstance(export_before_delete.get('items'), list), export_before_delete
+assert export_before_delete.get('count', 0) >= 1, export_before_delete
+assert delete_result.get('status') == 'ok', delete_result
+assert delete_result.get('deleted_count', 0) >= 1, delete_result
+assert isinstance(export_after_delete.get('items'), list), export_after_delete
 
 print(json.dumps({
     'health': health,
   'accepted_count': accepted_count,
+  'search_count': search_result.get('raw_count', 0),
   'daily_recall_count': daily_recall_count,
-    'export_count': len(export_result.get('items') or []),
+  'export_count_before_delete': len(export_before_delete.get('items') or []),
+  'deleted_count': delete_result.get('deleted_count', 0),
+  'export_count_after_delete': len(export_after_delete.get('items') or []),
 }, ensure_ascii=False, indent=2))
 PY

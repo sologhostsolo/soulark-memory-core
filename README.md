@@ -48,6 +48,15 @@ This v0.1 scope does not include persona, prompt orchestration, project-state pr
 
 ## Quick Start
 
+Docker Compose:
+
+```bash
+docker compose up -d --build
+curl http://127.0.0.1:8765/health
+```
+
+Local Python:
+
 ```bash
 pip install -r requirements.txt
 python run.py
@@ -86,14 +95,34 @@ curl -X POST http://127.0.0.1:8765/api/v1/search \
   -d '{"user_id":"demo_user","memory_space":"personal","query":"Memory Core","limit":5}'
 ```
 
-Export and delete:
+Recall by date:
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/date-recall \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","date":"2026-05-14","timezone":"UTC","limit":10}'
+```
+
+Daily recall:
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/v1/daily-recall \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"demo_user","memory_space":"personal","date":"2026-05-14","timezone":"UTC","limit":10}'
+```
+
+Export:
 
 ```bash
 curl "http://127.0.0.1:8765/api/v1/export?user_id=demo_user&memory_space=personal&limit=10"
+```
 
+Delete:
+
+```bash
 curl -X POST http://127.0.0.1:8765/api/v1/delete \
   -H "Content-Type: application/json" \
-  -d '{"user_id":"demo_user","memory_space":"personal","source_id":"demo-001"}'
+  -d '{"user_id":"demo_user","memory_space":"personal","ids":["<memory_id_from_write_response>"]}'
 ```
 
 ## Personal Integration Sample
@@ -136,6 +165,12 @@ bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765
 
 The compose file lives at `docker-compose.yml` and persists SQLite data under `./data`.
 
+The HTTP acceptance script verifies the complete v0.1 loop:
+
+```text
+health -> write -> search -> daily_recall -> export -> delete
+```
+
 If you prefer `systemd` instead of Docker:
 
 ```bash
@@ -154,9 +189,20 @@ For a one-command Docker acceptance flow on Windows PowerShell:
 ./scripts/verify_docker_acceptance.ps1
 ```
 
+## Release Checklist
+
+Before publishing or sharing a deployment, verify:
+
+- `data/` contains only `.gitkeep` in the repository.
+- `.env`, API keys, logs, and SQLite runtime files are not committed.
+- `bash scripts/verify_http_acceptance.sh http://127.0.0.1:8765` passes on Linux.
+- `./scripts/verify_docker_acceptance.ps1` passes on Windows with Docker.
+- The service is kept behind your own auth gateway before any public exposure.
+
 ## Security Notes
 
 - Do not expose this service directly to the public Internet without authentication, authorization, and rate limiting.
+- Add TLS, request logging, backup policy, and access audit before handling real customer or company memory.
 - Do not commit real memory databases, `.env` files, API keys, logs, or personal data.
 - The repository keeps `data/.gitkeep` only; runtime SQLite files are ignored by `.gitignore`.
 - Treat memory exports as sensitive user data.
