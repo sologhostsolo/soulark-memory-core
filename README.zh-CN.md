@@ -1,4 +1,4 @@
-# SoulArk Memory Core
+﻿# SoulArk Memory Core
 
 > 开源 AI 长期记忆可信底座：让 AI 记住用户、项目和决策，而且每条记忆都有证据、可删除、可导出。
 
@@ -246,6 +246,13 @@ Windows PowerShell 一键 Docker 验收：
 - v0.3：MCP / Project Brief
 - v0.4：stale memory、needs_review、superseded
 
+## 联系 / 交流
+
+如果你对长期记忆 AI 助手、私有化部署、项目记忆 / 客户历史助手感兴趣，可以扫码联系我。
+
+添加请备注：SoulArk
+
+![微信二维码](assets/wechat-qrcode.png)
 ## License
 
 MIT License. See [LICENSE](LICENSE).

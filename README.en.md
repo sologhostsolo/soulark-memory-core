@@ -1,4 +1,4 @@
-# SoulArk Memory Core
+﻿# SoulArk Memory Core
 
 > Open-source long-term memory core for AI Agents: stop making your AI start from zero every time.
 
@@ -207,6 +207,13 @@ Before publishing or sharing a deployment, verify:
 - The repository keeps `data/.gitkeep` only; runtime SQLite files are ignored by `.gitignore`.
 - Treat memory exports as sensitive user data.
 
+## Contact
+
+If you are interested in long-term memory AI assistants, private deployment, project memory, or customer-history assistants, scan the QR code below to contact me on WeChat.
+
+Please mention: SoulArk
+
+![WeChat QR Code](assets/wechat-qrcode.png)
 ## License
 
 MIT License. See [LICENSE](LICENSE).
