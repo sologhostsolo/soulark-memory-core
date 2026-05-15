@@ -8,7 +8,7 @@ SoulArk Memory Core is a self-hostable long-term memory foundation for AI agents
 
 ## Why SoulArk Memory Core?
 
-Most AI assistants are stateless: every new session feels like a fresh introduction. SoulArk Memory Core gives your agent a minimal memory API so it can write, recall, inspect, delete, and export memory with evidence.
+Most AI assistants are stateless: every new session feels like a fresh introduction. SoulArk Memory Core gives your agent a minimal memory API so it can write, keyword-search, recall by date, inspect, delete, and export memory with evidence.
 
 It is designed for:
 
@@ -18,7 +18,7 @@ It is designed for:
 - digital twin and second-brain products
 - applications that need traceable evidence instead of opaque recall
 
-SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time, so the project emphasizes evidence, traceability, deletion, and export.
+SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time. v0.1 focuses on evidence, traceability, deletion, and export; correction, replacement, and stale-memory lifecycle features are roadmap items.
 
 ## Architecture
 
@@ -36,7 +36,7 @@ flowchart LR
 The v0.1 scope is intentionally narrow:
 
 - `write`
-- `search`
+- `search` (keyword / text search)
 - `date_recall`
 - `daily_recall`
 - `delete`

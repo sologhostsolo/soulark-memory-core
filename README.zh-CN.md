@@ -4,7 +4,7 @@
 
 [English](README.en.md)
 
-SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包装。它是给 Personal、Work、Agent 产品使用的长期记忆 Core：负责把记忆写下来，按语义或日期召回，带证据返回，并支持删除和导出。
+SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包装。它是给 Personal、Work、Agent 产品使用的长期记忆 Core：负责把记忆写下来，按关键词 / 文本或日期召回，带证据返回，并支持删除和导出。
 
 它适合用来构建：
 
@@ -99,7 +99,7 @@ v0.1 不包含：
 - 为什么能这么回答
 - 能不能删除
 - 能不能导出
-- 后续能否被纠正或替换
+- 是否为后续纠错、替换和过期标记保留扩展空间
 
 ## 快速开始
 
@@ -241,7 +241,7 @@ Windows PowerShell 一键 Docker 验收：
 
 ## 路线图
 
-- v0.1：write / search / date_recall / daily_recall / delete / export / evidence / Docker
+- v0.1：write / keyword search / date_recall / daily_recall / delete / export / evidence / Docker
 - v0.2：Memory Card、FTS5、更清晰的 Web 查看
 - v0.3：MCP / Project Brief
 - v0.4：stale memory、needs_review、superseded
