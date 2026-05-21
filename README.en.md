@@ -44,6 +44,14 @@ The v0.1 scope is intentionally narrow:
 - SQLite persistence
 - minimal Flask web surface
 
+## Contract Docs
+
+v0.1 freezes the small memory loop first. Experience-layer behavior stays above Core:
+
+- [Scope](docs/scope.md)
+- [API Contract](docs/api_contract.md)
+- [Evidence Contract](docs/evidence_contract.md)
+
 This v0.1 scope does not include persona, prompt orchestration, project-state prompting, ambient logic, surprise recall, policy guard logic, or channel connectors. Those belong in the agent/product layer above Memory Core.
 
 ## Quick Start

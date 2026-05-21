@@ -3,6 +3,7 @@ import socket
 import tempfile
 import threading
 import unittest
+from pathlib import Path
 
 from examples.personal_core_integration_sample import run_personal_integration_sample
 from memory_core.app import create_app
@@ -575,6 +576,86 @@ class MemoryCoreNormalizerTests(unittest.TestCase):
         self.assertTrue(normalized["date_scope"]["enabled"])
         self.assertEqual(1, normalized["daily_recall"]["entry_count"])
         self.assertTrue(normalized["evidence"])
+
+    def test_normalizer_status_contract_found_weak_and_not_found(self):
+        found = normalize_memory_evidence(
+            tool_name="memory_search",
+            arguments={"query": "contract"},
+            result={
+                "evidence": [
+                    {
+                        "content": "Confirmed contract evidence.",
+                        "record_time": "2026-05-14T10:00:00+00:00",
+                        "date_text": "2026-05-14",
+                        "kind": "timeline_event",
+                        "source_type": "test",
+                        "answer_kind": "memory_entry",
+                        "info_weight": 0.8,
+                        "source_id": "contract-found",
+                        "memory_space": "personal",
+                    }
+                ],
+                "raw_count": 1,
+            },
+        )
+        self.assertEqual("found", found["status"])
+        self.assertEqual(0.8, found["confidence"])
+        self.assertEqual("direct_fact", found["evidence_kind"])
+
+        weak = normalize_memory_evidence(
+            tool_name="memory_search",
+            arguments={"query": "contract"},
+            result={
+                "evidence": [
+                    {
+                        "content": "Weak contract evidence.",
+                        "record_time": "2026-05-14T10:00:00+00:00",
+                        "date_text": "2026-05-14",
+                        "kind": "timeline_event",
+                        "source_type": "test",
+                        "answer_kind": "memory_entry",
+                        "info_weight": 0.4,
+                        "source_id": "contract-weak",
+                        "memory_space": "personal",
+                    }
+                ],
+                "raw_count": 1,
+            },
+        )
+        self.assertEqual("weak", weak["status"])
+        self.assertEqual(0.4, weak["confidence"])
+
+        not_found = normalize_memory_evidence(
+            tool_name="date_recall",
+            arguments={"date": "2026-05-14"},
+            result={"hits": [], "evidence": [], "hit_count": 0, "miss_reason": "no_results"},
+        )
+        self.assertEqual("not_found", not_found["status"])
+        self.assertEqual("no_results", not_found["miss_reason"])
+        self.assertEqual("related_context", not_found["evidence_kind"])
+
+
+class MemoryCoreContractDocsTests(unittest.TestCase):
+    def test_contract_docs_are_present_and_linked_from_readmes(self):
+        root = Path(__file__).resolve().parents[1]
+        docs = [
+            root / "docs" / "scope.md",
+            root / "docs" / "api_contract.md",
+            root / "docs" / "evidence_contract.md",
+        ]
+        for doc in docs:
+            self.assertTrue(doc.exists(), f"missing contract doc: {doc}")
+
+        readmes = [root / "README.md", root / "README.zh-CN.md", root / "README.en.md"]
+        for readme in readmes:
+            content = readme.read_text(encoding="utf-8")
+            self.assertIn("docs/scope.md", content)
+            self.assertIn("docs/api_contract.md", content)
+            self.assertIn("docs/evidence_contract.md", content)
+
+        scope = docs[0].read_text(encoding="utf-8")
+        self.assertIn("write -> search / date_recall / daily_recall -> evidence -> delete / export", scope)
+        self.assertIn("Out Of Scope", scope)
 
 
 class MemoryCoreIntegrationSampleTests(unittest.TestCase):

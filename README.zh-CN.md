@@ -76,6 +76,14 @@ v0.1 范围刻意保持很窄：
 - 最小 Flask Web / Demo 页面
 - evidence 返回
 
+## 契约文档
+
+当前先固定 v0.1 的小闭环，不往 Core 里塞体验层能力：
+
+- [Scope / 边界](docs/scope.md)
+- [API Contract / HTTP 契约](docs/api_contract.md)
+- [Evidence Contract / 证据契约](docs/evidence_contract.md)
+
 v0.1 不包含：
 
 - 人设 prompt
