@@ -83,6 +83,7 @@ v0.1 范围刻意保持很窄：
 - [Scope / 边界](docs/scope.md)
 - [API Contract / HTTP 契约](docs/api_contract.md)
 - [Evidence Contract / 证据契约](docs/evidence_contract.md)
+- [Claim Lifecycle Contract / 长期事实治理契约](docs/claim_lifecycle_contract.md)
 
 v0.1 不包含：
 

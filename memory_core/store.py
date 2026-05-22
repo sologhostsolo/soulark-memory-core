@@ -1080,6 +1080,44 @@ class SQLiteMemoryStore:
             row = connection.execute(sql, params).fetchone()
         return self._row_to_dict(row) if row else {}
 
+    def list_fact_slot_versions(
+        self,
+        topic: str,
+        fact_key: str,
+        *,
+        user_id: str = "",
+        memory_space: str = "",
+        source_id: str = "",
+        status: str = "",
+        limit: int = 20,
+    ) -> List[Dict[str, Any]]:
+        normalized_topic = str(topic or "").strip()
+        normalized_fact_key = str(fact_key or "").strip()
+        if not normalized_topic or not normalized_fact_key:
+            return []
+        normalized_user_id, normalized_space, normalized_source_id = self._normalize_scope(
+            user_id,
+            memory_space,
+            source_id,
+        )
+        clauses, params = self._build_scope_clauses(
+            user_id=normalized_user_id,
+            memory_space=normalized_space,
+            source_id=normalized_source_id,
+            user_required=True,
+        )
+        clauses.extend(["topic = ?", "fact_key = ?"])
+        params.extend([normalized_topic, normalized_fact_key])
+        normalized_status = str(status or "").strip().lower()
+        if normalized_status:
+            clauses.append("status = ?")
+            params.append(normalized_status)
+        params.append(max(1, min(100, self._safe_int(limit, 20))))
+        sql = "SELECT * FROM fact_slots WHERE " + " AND ".join(clauses) + " ORDER BY ts DESC LIMIT ?"
+        with self._connect() as connection:
+            rows = connection.execute(sql, params).fetchall()
+        return [self._row_to_dict(row) for row in rows]
+
     def has_recent_fact_slot_update(
         self,
         cutoff_ts: int,

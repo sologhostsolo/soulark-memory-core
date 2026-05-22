@@ -478,6 +478,90 @@ class MemoryCoreStoreMethodTests(unittest.TestCase):
         )
 
 
+class MemoryCoreClaimLifecycleTests(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        db_path = f"{self.temp_dir.name}/memory_core.db"
+        self.store = SQLiteMemoryStore(db_path)
+        self.store.initialize()
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_fact_slot_lifecycle_keeps_one_active_version(self):
+        first_id = self.store.upsert_fact_slot(
+            topic="work",
+            fact_key="main_role",
+            value_text="old role",
+            source_fact_id="1",
+            user_id="claim-user",
+            memory_space="personal",
+            source_id="claim-source-1",
+            occurred_at="2026-05-12T10:00:00+00:00",
+        )
+        second_id = self.store.upsert_fact_slot(
+            topic="work",
+            fact_key="main_role",
+            value_text="new role",
+            source_fact_id="2",
+            user_id="claim-user",
+            memory_space="personal",
+            source_id="claim-source-2",
+            occurred_at="2026-05-12T11:00:00+00:00",
+        )
+
+        active = self.store.get_fact_slot(
+            "work",
+            "main_role",
+            user_id="claim-user",
+            memory_space="personal",
+        )
+        self.assertEqual(second_id, active["id"])
+        self.assertEqual("new role", active["value_text"])
+        self.assertEqual("active", active["status"])
+
+        versions = self.store.list_fact_slot_versions(
+            "work",
+            "main_role",
+            user_id="claim-user",
+            memory_space="personal",
+        )
+        self.assertEqual([second_id, first_id], [row["id"] for row in versions])
+        self.assertEqual(["active", "superseded"], [row["status"] for row in versions])
+
+        active_versions = self.store.list_fact_slot_versions(
+            "work",
+            "main_role",
+            user_id="claim-user",
+            memory_space="personal",
+            status="active",
+        )
+        self.assertEqual([second_id], [row["id"] for row in active_versions])
+
+        stale_id = self.store.upsert_fact_slot(
+            topic="work",
+            fact_key="main_role",
+            value_text="stale role",
+            source_fact_id="1",
+            user_id="claim-user",
+            memory_space="personal",
+            source_id="claim-source-3",
+            occurred_at="2026-05-12T12:00:00+00:00",
+        )
+        self.assertEqual(second_id, stale_id)
+        self.assertEqual(
+            2,
+            len(
+                self.store.list_fact_slot_versions(
+                    "work",
+                    "main_role",
+                    user_id="claim-user",
+                    memory_space="personal",
+                )
+            ),
+        )
+
+
 class MemoryCoreExecutorTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()

@@ -21,6 +21,7 @@ Allowed capabilities:
 - `delete`: delete records by id with caller-side filters.
 - `export`: export records for user-controlled backup or inspection.
 - `evidence`: return traceable evidence for recall results.
+- `claim lifecycle`: keep one active `fact_slot` per scoped topic/key and supersede old values.
 - SQLite persistence for local/self-hosted deployment.
 - HTTP API for integration from Personal, Work Memory, or other agents.
 

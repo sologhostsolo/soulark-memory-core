@@ -51,6 +51,7 @@ v0.1 freezes the small memory loop first. Experience-layer behavior stays above 
 - [Scope](docs/scope.md)
 - [API Contract](docs/api_contract.md)
 - [Evidence Contract](docs/evidence_contract.md)
+- [Claim Lifecycle Contract](docs/claim_lifecycle_contract.md)
 
 This v0.1 scope does not include persona, prompt orchestration, project-state prompting, ambient logic, surprise recall, policy guard logic, or channel connectors. Those belong in the agent/product layer above Memory Core.
 

@@ -69,4 +69,6 @@ Memory Core does not decide:
 - whether a project direction changed.
 - whether a fact should become part of Stable Profile.
 
-Those decisions belong to the product layer or a future Claim Lifecycle layer.
+Those decisions belong to the product layer or Claim Lifecycle layer.
+
+See also: [Claim Lifecycle Contract](claim_lifecycle_contract.md).
