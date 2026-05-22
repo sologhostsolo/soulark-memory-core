@@ -115,6 +115,12 @@ def build_search_hit(item: Dict[str, Any], *, score: float, source_kind: str) ->
         "user_id": str(item.get("user_id") or "").strip(),
         "memory_space": str(item.get("memory_space") or "").strip(),
         "source_id": _first_non_empty(item.get("source_id"), item.get("event_id"), item.get("source_ref")),
+        "trace_ref": str(item.get("trace_ref") or "").strip(),
+        "info_weight": round(
+            max(0.0, min(1.0, _safe_float(item.get("info_weight"), item.get("confidence", 0.0)))),
+            4,
+        ),
+        "extra_json": extra,
     }
 
 
