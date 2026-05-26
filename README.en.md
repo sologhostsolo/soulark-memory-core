@@ -1,4 +1,4 @@
-﻿# SoulArk Memory Core
+# SoulArk Memory Core
 
 Persistent memory infrastructure for AI agents and workflow systems.
 
@@ -24,14 +24,24 @@ SoulArk Memory Core is a self-hostable long-term memory foundation for AI agents
 
 Most AI assistants are stateless: every new session feels like a fresh introduction. SoulArk Memory Core gives your agent a minimal memory API so it can write, keyword-search, recall by date, inspect, delete, and export memory with evidence.
 
-## Example Use Cases
+## Use Cases
 
-- Persistent memory for OpenClaw agents
-- Cross-session workflow memory
-- Structured recall for AI automation
-- Agent memory synchronization
+- Persistent memory for AI agents
+- Workflow memory across sessions
+- Structured recall for automation systems
+- Long-term memory for MCP / OpenClaw agents
 - Business knowledge persistence
-- Customer and sales history assistants
+
+## Simple Flow
+
+```mermaid
+flowchart TD
+    U[User] --> A[Agent]
+    A --> C[SoulArk Memory Core]
+    C --> M[Structured Memory]
+    M --> R[Recall / Context / Workflow]
+    R --> A
+```
 
 SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time. v0.1 focuses on evidence, traceability, deletion, and export; correction, replacement, and stale-memory lifecycle features are roadmap items.
 

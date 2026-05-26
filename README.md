@@ -20,14 +20,24 @@ SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包
 
 ![Company sales assistant demo](assets/sales-assistant-demo.gif)
 
-## Example Use Cases / 示例场景
+## Use Cases / 使用场景
 
-- Persistent memory for OpenClaw agents
-- Cross-session workflow memory
-- Structured recall for AI automation
-- Agent memory synchronization
+- Persistent memory for AI agents
+- Workflow memory across sessions
+- Structured recall for automation systems
+- Long-term memory for MCP / OpenClaw agents
 - Business knowledge persistence
-- Customer and sales history assistants
+
+## Simple Flow / 简单流程
+
+```mermaid
+flowchart TD
+    U[User] --> A[Agent]
+    A --> C[SoulArk Memory Core]
+    C --> M[Structured Memory]
+    M --> R[Recall / Context / Workflow]
+    R --> A
+```
 
 ## 解决什么问题
 
