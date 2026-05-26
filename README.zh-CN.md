@@ -1,14 +1,16 @@
-﻿# SoulArk Memory Core
+# SoulArk Memory Core
 
-Persistent memory core for AI agents and workflow systems.
+Persistent memory infrastructure for AI agents and workflow systems.
 
 Built for:
 
 - AI agents
-- workflow automation
 - MCP ecosystem
-- long-term memory
+- workflow automation
 - structured recall
+- long-term memory
+
+Current v0.1 focuses on the core memory loop: write, search, date recall, daily recall, delete, export, and evidence-backed results.
 
 > 开源 AI 长期记忆可信底座：让 AI 记住用户、项目和决策，而且每条记忆都有证据、可删除、可导出。
 
@@ -18,14 +20,14 @@ SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包
 
 ![Company sales assistant demo](assets/sales-assistant-demo.gif)
 
-它适合用来构建：
+## Example Use Cases / 示例场景
 
-- 个人 AI 助手的长期记忆
-- 项目记忆助手
-- 客户历史助手
-- 专家经验助手
-- 数字分身 / 第二大脑产品
-- 需要私有部署、证据追溯、删除和导出的 Agent 应用
+- Persistent memory for OpenClaw agents
+- Cross-session workflow memory
+- Structured recall for AI automation
+- Agent memory synchronization
+- Business knowledge persistence
+- Customer and sales history assistants
 
 ## 解决什么问题
 
@@ -44,22 +46,48 @@ SoulArk Memory Core 提供一个独立、可自托管、跨模型的长期记忆
 ## 技术结构
 
 ```mermaid
+flowchart LR
+    A[AI agents] --> C[Memory Core HTTP API]
+    B[Workflow systems] --> C
+    M[MCP tools] --> C
+    C --> D[Write / Search / Recall / Delete / Export]
+    D --> E[(SQLite store)]
+    E --> F[Evidence-backed memory results]
+    F --> A
+    F --> B
+    F --> M
+```
+
+## Memory Flow / 记忆流
+
+```mermaid
 flowchart TD
-    A["AI 助手 / Agent / Personal / Work"] --> B["SoulArk Memory Core"]
-    B --> C["write"]
-    B --> D["search"]
-    B --> E["date_recall"]
-    B --> F["daily_recall"]
-    B --> G["delete"]
-    B --> H["export"]
-    C --> I["SQLite Store"]
-    D --> I
-    E --> I
-    F --> I
+    A[Conversation / event / workflow signal] --> B[Write memory]
+    B --> C[Normalize metadata]
+    C --> D[Store with source evidence]
+    D --> E{Recall mode}
+    E --> F[Search by query]
+    E --> G[Recall by date]
+    E --> H[Daily recall]
+    F --> I[Evidence-backed result]
     G --> I
     H --> I
-    I --> J["Evidence-backed Results"]
-    J --> A
+    I --> J[Agent or workflow uses memory]
+```
+
+## Workflow Example / 工作流示例
+
+```mermaid
+sequenceDiagram
+    participant Sales as Sales assistant
+    participant Core as SoulArk Memory Core
+    participant Store as SQLite memory store
+    Sales->>Core: write customer note
+    Core->>Store: store content + source evidence
+    Sales->>Core: search ACME renewal preferences
+    Core->>Store: retrieve matching memories
+    Store-->>Core: evidence-backed hits
+    Core-->>Sales: preferences + next action context
 ```
 
 ## 使用场景：公司销售助手

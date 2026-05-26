@@ -1,14 +1,16 @@
 ﻿# SoulArk Memory Core
 
-Persistent memory core for AI agents and workflow systems.
+Persistent memory infrastructure for AI agents and workflow systems.
 
 Built for:
 
 - AI agents
-- workflow automation
 - MCP ecosystem
-- long-term memory
+- workflow automation
 - structured recall
+- long-term memory
+
+Current v0.1 focuses on the core memory loop: write, search, date recall, daily recall, delete, export, and evidence-backed results.
 
 > Open-source long-term memory core for AI Agents: stop making your AI start from zero every time.
 
@@ -22,13 +24,14 @@ SoulArk Memory Core is a self-hostable long-term memory foundation for AI agents
 
 Most AI assistants are stateless: every new session feels like a fresh introduction. SoulArk Memory Core gives your agent a minimal memory API so it can write, keyword-search, recall by date, inspect, delete, and export memory with evidence.
 
-It is designed for:
+## Example Use Cases
 
-- long-term memory for AI agents
-- self-hosted personal AI assistants
-- model-agnostic memory infrastructure
-- digital twin and second-brain products
-- applications that need traceable evidence instead of opaque recall
+- Persistent memory for OpenClaw agents
+- Cross-session workflow memory
+- Structured recall for AI automation
+- Agent memory synchronization
+- Business knowledge persistence
+- Customer and sales history assistants
 
 SoulArk Memory Core does not promise perfect or permanent truth. Memory can become outdated or corrected over time. v0.1 focuses on evidence, traceability, deletion, and export; correction, replacement, and stale-memory lifecycle features are roadmap items.
 
@@ -36,11 +39,47 @@ SoulArk Memory Core does not promise perfect or permanent truth. Memory can beco
 
 ```mermaid
 flowchart LR
-    A["AI Agent / Personal App"] --> B["Memory Core HTTP API"]
-    B --> C["Write / Search / Date Recall / Daily Recall"]
-    C --> D["SQLite Store"]
-    D --> E["Evidence-backed Results"]
-    E --> A
+    A[AI agents] --> C[Memory Core HTTP API]
+    B[Workflow systems] --> C
+    M[MCP tools] --> C
+    C --> D[Write / Search / Recall / Delete / Export]
+    D --> E[(SQLite store)]
+    E --> F[Evidence-backed memory results]
+    F --> A
+    F --> B
+    F --> M
+```
+
+## Memory Flow
+
+```mermaid
+flowchart TD
+    A[Conversation / event / workflow signal] --> B[Write memory]
+    B --> C[Normalize metadata]
+    C --> D[Store with source evidence]
+    D --> E{Recall mode}
+    E --> F[Search by query]
+    E --> G[Recall by date]
+    E --> H[Daily recall]
+    F --> I[Evidence-backed result]
+    G --> I
+    H --> I
+    I --> J[Agent or workflow uses memory]
+```
+
+## Workflow Example
+
+```mermaid
+sequenceDiagram
+    participant Sales as Sales assistant
+    participant Core as SoulArk Memory Core
+    participant Store as SQLite memory store
+    Sales->>Core: write customer note
+    Core->>Store: store content + source evidence
+    Sales->>Core: search ACME renewal preferences
+    Core->>Store: retrieve matching memories
+    Store-->>Core: evidence-backed hits
+    Core-->>Sales: preferences + next action context
 ```
 
 ## Use Case: Company Sales Assistant
