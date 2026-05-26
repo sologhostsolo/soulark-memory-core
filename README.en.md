@@ -1,10 +1,22 @@
 ﻿# SoulArk Memory Core
 
+Persistent memory core for AI agents and workflow systems.
+
+Built for:
+
+- AI agents
+- workflow automation
+- MCP ecosystem
+- long-term memory
+- structured recall
+
 > Open-source long-term memory core for AI Agents: stop making your AI start from zero every time.
 
 [中文说明](README.zh-CN.md)
 
 SoulArk Memory Core is a self-hostable long-term memory foundation for AI agents, personal AI assistants, and digital twin products. It focuses on durable memory records, traceable evidence, deletion, export, and a small HTTP API that can sit behind your own agent layer.
+
+![Company sales assistant demo](assets/sales-assistant-demo.gif)
 
 ## Why SoulArk Memory Core?
 
@@ -30,6 +42,20 @@ flowchart LR
     D --> E["Evidence-backed Results"]
     E --> A
 ```
+
+## Use Case: Company Sales Assistant
+
+A company sales assistant can turn scattered customer interactions into durable, searchable memory for the next workflow step.
+
+Example workflow:
+
+- A sales rep records: `ACME prefers short renewal proposals and cares most about onboarding speed.`
+- The workflow calls `write` to store the customer memory with source evidence.
+- Before the next follow-up, the assistant calls `search` with `ACME renewal preferences`.
+- The assistant recalls preferences, decision makers, objections, and next actions.
+- It drafts a 1-page renewal proposal, leads with onboarding speed, and asks Lisa for a 15-minute review.
+
+This fits CRM copilots, Feishu/Slack workflows, n8n automations, MCP tools, and internal sales agents.
 
 ## Current Scope
 

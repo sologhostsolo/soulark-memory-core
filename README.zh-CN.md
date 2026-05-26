@@ -1,10 +1,22 @@
 ﻿# SoulArk Memory Core
 
+Persistent memory core for AI agents and workflow systems.
+
+Built for:
+
+- AI agents
+- workflow automation
+- MCP ecosystem
+- long-term memory
+- structured recall
+
 > 开源 AI 长期记忆可信底座：让 AI 记住用户、项目和决策，而且每条记忆都有证据、可删除、可导出。
 
 [English](README.en.md)
 
 SoulArk Memory Core 不是另一个聊天机器人，也不是普通向量库包装。它是给 Personal、Work、Agent 产品使用的长期记忆 Core：负责把记忆写下来，按关键词 / 文本或日期召回，带证据返回，并支持删除和导出。
+
+![Company sales assistant demo](assets/sales-assistant-demo.gif)
 
 它适合用来构建：
 
@@ -49,6 +61,20 @@ flowchart TD
     I --> J["Evidence-backed Results"]
     J --> A
 ```
+
+## 使用场景：公司销售助手
+
+公司销售助手可以把每一次客户沟通沉淀成可召回的长期记忆，而不是散落在聊天记录、CRM 备注和个人脑子里。
+
+一个真实工作流可以是：
+
+- 销售记录：`ACME 更喜欢短版续费方案，最关心 onboarding speed。`
+- 工作流调用 `write` 写入客户记忆空间，并保留来源证据。
+- 下次跟进前，销售助手用 `search` 查询 `ACME renewal preferences`。
+- 助手召回客户偏好、预算负责人、历史异议和下一步动作。
+- 最终输出：一页续费方案、主打 onboarding speed、约 Lisa 做 15 分钟复盘。
+
+这类场景适合接入 CRM、飞书/Slack、n8n、MCP 工具和企业内部销售 Agent。
 
 ## 产品分层
 
